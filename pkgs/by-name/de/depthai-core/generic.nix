@@ -163,12 +163,12 @@ stdenv.mkDerivation (rec {
   patches = [
     # Offine build
     (fetchpatch {
-      url = "https://github.com/luxonis/depthai-core/pull/1303/commits/5340a086445282f121dfe25966e00bf13dd4ef67.patch";
+      url = "https://github.com/luxonis/depthai-core/commit/5340a086445282f121dfe25966e00bf13dd4ef67.patch";
       hash = "sha256-JoNaYJ4j7upBLvf2tfQE5Fh7KRr2FO+is0eselzqwIE=";
     })
     # CMake system install and fix RPATH
     (fetchpatch {
-      url = "https://github.com/luxonis/depthai-core/pull/1309/commits/3caf449df59ea245797f4363da53149ef2978897.patch";
+      url = "https://github.com/luxonis/depthai-core/commit/3caf449df59ea245797f4363da53149ef2978897.patch";
       hash = "sha256-J2NrGjWMeH4ks9cSfa+vtm4UTRM7Wp//0F/q+u/aKCs=";
     })
 
