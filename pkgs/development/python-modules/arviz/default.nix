@@ -4,6 +4,9 @@
   buildPythonPackage,
   fetchFromGitHub,
 
+  # nativeBuildInputs
+  writableTmpDirAsHomeHook,
+
   # build-system
   packaging,
   setuptools,
@@ -33,21 +36,27 @@
   #, pystan (not packaged)
   pytestCheckHook,
   torchvision,
-  writableTmpDirAsHomeHook,
   zarr,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "arviz";
-  version = "0.21.0";
+  version = "0.23.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "arviz-devs";
     repo = "arviz";
-    tag = "v${version}";
-    hash = "sha256-rrOvdyZE0wo3iiiQ2hHklAtLU38mXs3hLsb+Fwy9eAk=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-twAYCH8jsOnXVD3+sstOLEGG1Enbq8M8ZQWffFVzS48=";
   };
+
+  nativeBuildInputs = [
+    # Arviz wants to write a stamp file to the homedir at import time.
+    # Without $HOME being writable, `pythonImportsCheck` fails.
+    # https://github.com/arviz-devs/arviz/commit/4db612908f588d89bb5bfb6b83a08ada3d54fd02
+    writableTmpDirAsHomeHook
+  ];
 
   build-system = [
     packaging
@@ -56,6 +65,7 @@ buildPythonPackage rec {
 
   dependencies = [
     h5netcdf
+    h5py
     matplotlib
     numpy
     pandas
@@ -70,7 +80,6 @@ buildPythonPackage rec {
     cloudpickle
     emcee
     ffmpeg
-    h5py
     jax
     jaxlib
     numba
@@ -80,17 +89,18 @@ buildPythonPackage rec {
     # pystan (not packaged)
     pytestCheckHook
     torchvision
-    writableTmpDirAsHomeHook
     zarr
   ];
 
-  pytestFlagsArray = [
+  enabledTestPaths = [
     "arviz/tests/base_tests/"
+  ];
 
+  disabledTestPaths = [
     # AttributeError: module 'zarr.storage' has no attribute 'DirectoryStore'
     # https://github.com/arviz-devs/arviz/issues/2357
-    "--deselect=arviz/tests/base_tests/test_data_zarr.py::TestDataZarr::test_io_function"
-    "--deselect=arviz/tests/base_tests/test_data_zarr.py::TestDataZarr::test_io_method"
+    "arviz/tests/base_tests/test_data_zarr.py::TestDataZarr::test_io_function"
+    "arviz/tests/base_tests/test_data_zarr.py::TestDataZarr::test_io_method"
   ];
 
   disabledTests = [
@@ -114,8 +124,8 @@ buildPythonPackage rec {
   meta = {
     description = "Library for exploratory analysis of Bayesian models";
     homepage = "https://arviz-devs.github.io/arviz/";
-    changelog = "https://github.com/arviz-devs/arviz/blob/v${version}/CHANGELOG.md";
+    changelog = "https://github.com/arviz-devs/arviz/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [ omnipotententity ];
   };
-}
+})

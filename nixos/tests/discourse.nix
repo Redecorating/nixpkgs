@@ -4,9 +4,9 @@
 #  3. replying to that message via email.
 
 {
-  pkgs,
   lib,
-  package ? pkgs.discourse,
+  package,
+  pkgs,
   ...
 }:
 let
@@ -24,14 +24,12 @@ let
 in
 {
   name = "discourse";
-  meta = with pkgs.lib.maintainers; {
-    maintainers = [ talyz ];
-  };
+  meta.maintainers = with lib.maintainers; [ talyz ];
 
   nodes.discourse =
     { nodes, ... }:
     {
-      virtualisation.memorySize = 2048;
+      virtualisation.memorySize = 4096;
       virtualisation.cores = 4;
       virtualisation.useNixStoreImage = true;
       virtualisation.writableStore = false;
@@ -107,13 +105,13 @@ in
 
       services.postfix = {
         enable = true;
-        origin = clientDomain;
-        relayDomains = [ clientDomain ];
-        config = {
+        settings.main = {
           compatibility_level = "2";
-          smtpd_banner = "ESMTP server";
+          mydestination = [ clientDomain ];
           myhostname = clientDomain;
-          mydestination = clientDomain;
+          origin = clientDomain;
+          relay_domains = [ clientDomain ];
+          smtpd_banner = "ESMTP server";
         };
       };
 
@@ -190,7 +188,7 @@ in
       )
 
       client.wait_for_unit("postfix.service")
-      client.wait_for_unit("dovecot2.service")
+      client.wait_for_unit("dovecot.service")
 
       discourse.succeed(
           "sudo -u discourse discourse-rake api_key:create_master[master] >api_key",

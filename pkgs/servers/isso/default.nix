@@ -1,5 +1,4 @@
 {
-  pkgs,
   nodejs,
   lib,
   python3Packages,
@@ -14,10 +13,11 @@ with python3Packages;
 buildPythonApplication rec {
   pname = "isso";
   version = "0.13.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "posativ";
-    repo = pname;
+    repo = "isso";
     tag = version;
     sha256 = "sha256-kZNf7Rlb1DZtQe4dK1B283OkzQQcCX+pbvZzfL65gsA=";
   };
@@ -66,21 +66,17 @@ buildPythonApplication rec {
   '';
 
   nativeCheckInputs = [
-    pytest
-    pytest-cov
+    pytestCheckHook
+    pytest-cov-stub
   ];
-
-  checkPhase = ''
-    pytest
-  '';
 
   passthru.tests = { inherit (nixosTests) isso; };
 
-  meta = with lib; {
+  meta = {
     description = "Commenting server similar to Disqus";
     mainProgram = "isso";
     homepage = "https://posativ.org/isso/";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fgaz ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fgaz ];
   };
 }

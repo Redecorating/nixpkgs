@@ -10,23 +10,22 @@
 
 let
   pname = "cargo-mobile2";
-  version = "0.20.0";
+  version = "0.22.2";
 in
 rustPlatform.buildRustPackage {
   inherit pname version;
   src = fetchFromGitHub {
     owner = "tauri-apps";
-    repo = pname;
+    repo = "cargo-mobile2";
     rev = "cargo-mobile2-v${version}";
-    hash = "sha256-7/ol4Jb/2s007LeSMo6YYDT5vipsZZF6O4hfJ7ylHGg=";
+    hash = "sha256-pSp7w823Jjjg0PEnCc7jVLBbOgvR7JAjtD8OK5voC0A=";
   };
 
   # Manually specify the sourceRoot since this crate depends on other crates in the workspace. Relevant info at
   # https://discourse.nixos.org/t/difficulty-using-buildrustpackage-with-a-src-containing-multiple-cargo-workspaces/10202
   # sourceRoot = "${src.name}/tooling/cli";
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-zSUT2zClpSlBDu6vgMv4TZn9Jp0Ych6EQKo1AwkSMXU=";
+  cargoHash = "sha256-aci1QF/O2J6Yix4UkxPCVW+c+xoqm7AvdhlkF7y1GqA=";
 
   preBuild = ''
     mkdir -p $out/share/
@@ -48,13 +47,13 @@ rustPlatform.buildRustPackage {
     done
   '';
 
-  meta = with lib; {
-    description = "Rust on mobile made easy!";
+  meta = {
+    description = "Rust on mobile made easy";
     homepage = "https://tauri.app/";
-    license = with licenses; [
+    license = with lib.licenses; [
       asl20 # or
       mit
     ];
-    maintainers = with maintainers; [ happysalada ];
+    maintainers = with lib.maintainers; [ happysalada ];
   };
 }

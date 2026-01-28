@@ -17,16 +17,16 @@
 
 buildGoModule (finalAttrs: {
   pname = "geteduroam";
-  version = "0.11";
+  version = "0.13";
 
   src = fetchFromGitHub {
     owner = "geteduroam";
     repo = "linux-app";
     tag = finalAttrs.version;
-    hash = "sha256-CbgQn6mf1125DYKBDId+BmFMcfdWNW2M4/iLoiELOAY=";
+    hash = "sha256-fmkTenN5F2FEimYUQi6JVUGmHcnVJvE9Giur+xTl+1s=";
   };
 
-  vendorHash = "sha256-b06wnqT88J7etNTFJ6nE9Uo0gOQOGvvs0vPNnJr6r4Q=";
+  vendorHash = "sha256-kmBuyIs5S6h51+tF7vhY92o6VP+M7QI9AwuZSQUwjXg=";
 
   subPackages = [
     "cmd/geteduroam-gui"
@@ -61,7 +61,6 @@ buildGoModule (finalAttrs: {
     versionCheckHook
   ];
   versionCheckProgram = "${placeholder "out"}/bin/geteduroam-gui";
-  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru = {

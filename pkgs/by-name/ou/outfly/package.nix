@@ -22,7 +22,7 @@ rustPlatform.buildRustPackage rec {
     domain = "codeberg.org";
     owner = "outfly";
     repo = "outfly";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-FRvu3FgbT3i5888ll573nhb7naYx04Oi8nrcfgEHxUo=";
   };
 
@@ -49,7 +49,6 @@ rustPlatform.buildRustPackage rec {
     --add-rpath ${lib.makeLibraryPath runtimeInputs}
   '';
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-5t6PPlfV/INqb4knz1Bv6dqw47RxUmVO0DSlQNUIQL4=";
 
   desktopItems = [

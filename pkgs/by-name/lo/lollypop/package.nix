@@ -30,12 +30,12 @@ python3.pkgs.buildPythonApplication rec {
   pname = "lollypop";
   version = "1.4.40";
 
-  format = "other";
+  pyproject = false;
 
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "World";
-    repo = pname;
+    repo = "lollypop";
     rev = version;
     fetchSubmodules = true;
     hash = "sha256-hdReviNgcigXuNqJns6aPW+kixlpmRXtqrLlm/LGHBo=";

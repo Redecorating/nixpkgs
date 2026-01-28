@@ -1,6 +1,7 @@
 {
+  systemdStage1,
+  lib,
   pkgs,
-  systemdStage1 ? false,
   ...
 }:
 let
@@ -8,9 +9,9 @@ let
 in
 {
   name = "systemd-shutdown";
-  meta = with pkgs.lib.maintainers; {
-    maintainers = [ das_j ];
-  };
+  meta.maintainers = with lib.maintainers; [ das_j ];
+
+  _module.args.systemdStage1 = lib.mkDefault false;
 
   nodes.machine = {
     imports = [ ../modules/profiles/minimal.nix ];
@@ -26,7 +27,7 @@ in
     # automatically and that 'systemd-shutdown' runs our script.
     machine.wait_for_unit("multi-user.target")
     # .shutdown() would wait for the machine to power off
-    machine.succeed("systemctl poweroff")
+    machine.execute("systemctl poweroff", check_return=False)
     # Message printed by systemd-shutdown
     machine.wait_for_console_text("Unmounting '/oldroot'")
     machine.wait_for_console_text("${msg}")

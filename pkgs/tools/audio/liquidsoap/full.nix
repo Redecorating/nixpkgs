@@ -3,7 +3,6 @@
   stdenv,
   makeWrapper,
   fetchFromGitHub,
-  fetchpatch,
   which,
   pkg-config,
   libjpeg,
@@ -11,6 +10,7 @@
   awscli2,
   bubblewrap,
   curl,
+  dune,
   ffmpeg,
   yt-dlp,
   runtimePackages ? [
@@ -21,35 +21,22 @@
     yt-dlp
   ],
 }:
-
-let
+stdenv.mkDerivation (finalAttrs: {
   pname = "liquidsoap";
-  version = "2.3.0";
-in
-stdenv.mkDerivation {
-  inherit pname version;
+  version = "2.4.2";
 
   src = fetchFromGitHub {
     owner = "savonet";
     repo = "liquidsoap";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-wNOENkIQw8LWfceI24aa8Ja3ZkePgTIGdIpGgqs/3Ss=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-ViJlG+AUncL37mltlFFXVho98Up11qZI3wwSnrd9C8g=";
   };
 
-  patches = [
-    # Compatibility with saturn_lockfree 0.5.0
-    (fetchpatch {
-      url = "https://github.com/savonet/liquidsoap/commit/3d6d2d9cd1c7750f2e97449516235a692b28bf56.patch";
-      includes = [ "src/*" ];
-      hash = "sha256-pmC3gwmkv+Hat61aulNkTKS4xMz+4D94OCMtzhzNfT4=";
-    })
-  ];
-
   postPatch = ''
-    substituteInPlace src/lang/dune \
+    substituteInPlace src/lang/base/dune \
       --replace-warn "(run git rev-parse --short HEAD)" "(run echo -n nixpkgs)"
     # Compatibility with camlimages 5.0.5
-    substituteInPlace src/core/dune \
+    substituteInPlace src/core/optionals/camlimages/dune \
       --replace-warn camlimages.all_formats camlimages.core
   '';
 
@@ -88,7 +75,7 @@ stdenv.mkDerivation {
     pkg-config
     which
     ocamlPackages.ocaml
-    ocamlPackages.dune_3
+    dune
     ocamlPackages.findlib
     ocamlPackages.menhir
   ];
@@ -113,10 +100,10 @@ stdenv.mkDerivation {
     ocamlPackages.metadata
     ocamlPackages.dune-build-info
     ocamlPackages.re
-    ocamlPackages.saturn_lockfree # liquidsoap-lang
     ocamlPackages.sedlex # liquidsoap-lang
     ocamlPackages.ppx_hash # liquidsoap-lang
     ocamlPackages.ppx_string
+    ocamlPackages.xml-light # liquidsoap-lang
 
     # Recommended dependencies
     ocamlPackages.ffmpeg
@@ -133,7 +120,6 @@ stdenv.mkDerivation {
     ocamlPackages.frei0r
     ocamlPackages.gd
     ocamlPackages.graphics
-    # ocamlPackages.gstreamer # Broken but advertised feature
     ocamlPackages.imagelib
     ocamlPackages.inotify
     ocamlPackages.ladspa
@@ -151,6 +137,7 @@ stdenv.mkDerivation {
     ocamlPackages.shine
     ocamlPackages.soundtouch
     ocamlPackages.speex
+    ocamlPackages.ocaml_sqlite3
     ocamlPackages.srt
     ocamlPackages.ssl
     ocamlPackages.taglib
@@ -170,9 +157,9 @@ stdenv.mkDerivation {
     changelog = "https://raw.githubusercontent.com/savonet/liquidsoap/main/CHANGES.md";
     maintainers = with lib.maintainers; [
       dandellion
-      ehmry
+      juaningan
     ];
     license = lib.licenses.gpl2Plus;
     platforms = ocamlPackages.ocaml.meta.platforms or [ ];
   };
-}
+})

@@ -12,7 +12,7 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "arti";
-  version = "1.4.2";
+  version = "1.9.0";
 
   src = fetchFromGitLab {
     domain = "gitlab.torproject.org";
@@ -20,11 +20,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "core";
     repo = "arti";
     tag = "arti-v${finalAttrs.version}";
-    hash = "sha256-dryW7znckIsa7O2H0U7p1urBXtANU6B9Pv11A+pBiho=";
+    hash = "sha256-b5DWu38/iKwKcmp4BNgkeE5F522YRZZiev9gUZ/Rb1E=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-o4he+WVsXf5GymTOvbBIsdhnGrvDtD8AMWmRMQMNiOw=";
+  cargoHash = "sha256-SGxSZaY8//FHhySbarfgleafF5YEWJW/fUAwo3576NI=";
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
 
@@ -40,15 +39,31 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "arti"
   ];
 
+  # `full` includes all stable and non-conflicting feature flags. the primary
+  # downsides are increased binary size and memory usage for building, but
+  # those are acceptable for nixpkgs
+  buildFeatures = [ "full" ];
+
+  # several tests under `full` require access to internal types, which are
+  # currently marked as experimental for public usage.
+  checkFeatures = [
+    "full"
+    "experimental-api"
+  ];
+
   checkFlags = [
     # problematic test that hangs the build
-    "--skip=reload_cfg::test::watch_multiple"
+    "--skip=reload_cfg::test::watch_single_file"
   ];
+
+  # some of the CLI tests attempt to validate that the filesystem and runtime
+  # environment are securely configured, which breaks inside the nix build
+  # sandbox. this does NOT affect downstream users of Arti.
+  env.ARTI_FS_DISABLE_PERMISSION_CHECKS = 1;
 
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
-  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru = {

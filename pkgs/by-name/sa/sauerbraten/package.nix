@@ -8,9 +8,11 @@
   copyDesktopItems,
 
   # buildInputs
+  libGL,
   SDL2,
   SDL2_image,
   SDL2_mixer,
+  libx11,
   zlib,
 
   makeDesktopItem,
@@ -33,9 +35,11 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
+    libGL
     SDL2
     SDL2_image
     SDL2_mixer
+    libx11
     zlib
   ];
 

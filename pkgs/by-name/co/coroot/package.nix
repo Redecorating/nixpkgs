@@ -11,19 +11,19 @@
 
 buildGoModule rec {
   pname = "coroot";
-  version = "1.10.1";
+  version = "1.17.9";
 
   src = fetchFromGitHub {
     owner = "coroot";
     repo = "coroot";
     rev = "v${version}";
-    hash = "sha256-3HSILiqgmEm/ZzyvhNspnAuHGw/CyyeYd9f561bZjF4=";
+    hash = "sha256-hr1t3WaYEOYnj3Cam2NGgiGD49Vr9HBkz4JmOlJxzQQ=";
   };
 
-  vendorHash = "sha256-1yKb8CuNcwpHWC0eDIs2Ml3H7xGYaTCGxyrtuyLvd8c=";
+  vendorHash = "sha256-DCdrE8UYkuUN+rUuxVSGbAnAeLivZ2Xp8xjM+56ZF+A=";
   npmDeps = fetchNpmDeps {
     src = "${src}/front";
-    hash = "sha256-inZV+iv837+7ntBae/oLSNLxpzoqEcJNPNdBE+osJHQ=";
+    hash = "sha256-6a8eOPgAdpZpdXmrHVw/twfikjjWHSy/BdYdlyRQkjc=";
   };
 
   nativeBuildInputs = [

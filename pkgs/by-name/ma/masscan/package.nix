@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
     install -Dm444 -t $out/share/licenses/masscan LICENSE
 
     wrapProgram $out/bin/masscan \
-      --prefix LD_LIBRARY_PATH : "${libpcap}/lib"
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ libpcap ]}"
   '';
 
   doInstallCheck = true;
@@ -63,13 +63,13 @@ stdenv.mkDerivation rec {
     $out/bin/masscan --selftest
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Fast scan of the Internet";
     mainProgram = "masscan";
     homepage = "https://github.com/robertdavidgraham/masscan";
     changelog = "https://github.com/robertdavidgraham/masscan/releases/tag/${version}";
-    license = licenses.agpl3Only;
-    platforms = platforms.unix;
-    maintainers = with maintainers; [ rnhmjoj ];
+    license = lib.licenses.agpl3Only;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [ rnhmjoj ];
   };
 }

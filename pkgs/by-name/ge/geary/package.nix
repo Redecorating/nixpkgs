@@ -5,7 +5,7 @@
   pkg-config,
   gtk3,
   vala,
-  enchant2,
+  enchant,
   wrapGAppsHook3,
   meson,
   ninja,
@@ -70,7 +70,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     adwaita-icon-theme
-    enchant2
+    enchant
     folks
     gcr
     glib-networking
@@ -151,12 +151,12 @@ stdenv.mkDerivation rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://gitlab.gnome.org/GNOME/geary";
     changelog = "https://gitlab.gnome.org/GNOME/geary/-/blob/${version}/NEWS?ref_type=tags";
     description = "Mail client for GNOME 3";
-    teams = [ teams.gnome ];
-    license = licenses.lgpl21Plus;
-    platforms = platforms.linux;
+    teams = [ lib.teams.gnome ];
+    license = lib.licenses.lgpl21Plus;
+    platforms = lib.platforms.linux;
   };
 }

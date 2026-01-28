@@ -6,7 +6,9 @@
   pandoc,
   installShellFiles,
   perl,
-  xorg,
+  libxext,
+  libx11,
+  x11perf,
   libGLX,
   coreutils,
   unixtools,
@@ -48,34 +50,33 @@ stdenv.mkDerivation rec {
     installShellFiles
   ];
 
-  buildInputs =
-    [ perl ]
-    ++ lib.optionals withGL [
-      xorg.libX11
-      xorg.libXext
-      libGLX
-    ];
+  buildInputs = [
+    perl
+  ]
+  ++ lib.optionals withGL [
+    libx11
+    libxext
+    libGLX
+  ];
 
-  runtimeDependencies =
-    [
-      coreutils
-      unixtools.nettools
-      unixtools.locale
-      targetPackages.stdenv.cc
-      gnugrep
-      gawk
-    ]
-    ++ lib.optionals withX11perf [
-      xorg.x11perf
-    ];
+  runtimeDependencies = [
+    coreutils
+    unixtools.net-tools
+    unixtools.locale
+    targetPackages.stdenv.cc
+    gnugrep
+    gawk
+  ]
+  ++ lib.optionals withX11perf [
+    x11perf
+  ];
 
-  makeFlags =
-    [
-      "CC=${stdenv.cc.targetPrefix}cc"
-    ]
-    ++ lib.optionals withGL [
-      "GRAPHIC_TESTS=defined"
-    ];
+  makeFlags = [
+    "CC=${stdenv.cc.targetPrefix}cc"
+  ]
+  ++ lib.optionals withGL [
+    "GRAPHIC_TESTS=defined"
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -106,12 +107,12 @@ stdenv.mkDerivation rec {
       --prefix PATH : ${lib.makeBinPath runtimeDependencies}
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Basic indicator of the performance of a Unix-like system";
     homepage = "https://github.com/kdlucas/byte-unixbench";
-    license = licenses.gpl2Plus;
+    license = lib.licenses.gpl2Plus;
     mainProgram = "ubench";
-    maintainers = with maintainers; [ aleksana ];
-    platforms = platforms.unix;
+    maintainers = with lib.maintainers; [ aleksana ];
+    platforms = lib.platforms.unix;
   };
 }

@@ -10,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "superfly";
-    repo = pname;
+    repo = "litefs";
     rev = "v${version}";
     sha256 = "sha256-URwHnOvvz/UnrxoFIuUYpw10uPHgxQf9LPO1xECixDE=";
   };
@@ -35,11 +35,11 @@ buildGoModule rec {
 
   doCheck = false; # fails
 
-  meta = with lib; {
+  meta = {
     description = "FUSE-based file system for replicating SQLite databases across a cluster of machines";
     homepage = "https://github.com/superfly/litefs";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ dit7ya ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ dit7ya ];
     mainProgram = "litefs";
   };
 }

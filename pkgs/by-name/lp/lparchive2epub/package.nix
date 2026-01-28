@@ -12,12 +12,16 @@ python3Packages.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "Arwalk";
-    repo = pname;
+    repo = "lparchive2epub";
     tag = "v${version}";
     hash = "sha256-h1i/p14Zzzr0SK+OjcCnXpsVjJl7mrbeLJ5JlnA0wPU=";
   };
 
   build-system = with python3Packages; [ poetry-core ];
+
+  pythonRelaxDeps = [
+    "ebooklib"
+  ];
 
   dependencies = with python3Packages; [
     ebooklib

@@ -10,22 +10,18 @@
   setuptools,
   tqdm,
   urllib3,
-  pythonOlder,
-  importlib-metadata,
 }:
 
 buildPythonPackage rec {
   pname = "internetarchive";
-  version = "5.4.0";
+  version = "5.7.1";
   pyproject = true;
-
-  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "jjjake";
     repo = "internetarchive";
     tag = "v${version}";
-    hash = "sha256-2IL4VUt958atKDqCmj6rZ9I74tBRsA42EF1F1YT433E=";
+    hash = "sha256-SNzscVFFuvRyG976lWtktPobcIvfQgk4tAQ8+NXu4yw=";
   };
 
   build-system = [ setuptools ];
@@ -36,7 +32,7 @@ buildPythonPackage rec {
     jsonpatch
     schema
     urllib3
-  ] ++ lib.optionals (pythonOlder "3.10") [ importlib-metadata ];
+  ];
 
   nativeCheckInputs = [
     responses

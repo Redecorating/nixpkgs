@@ -10,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "GoogleCloudPlatform";
-    repo = pname;
+    repo = "terraformer";
     rev = version;
     sha256 = "sha256-xbZm0FOa/W6/qXMnJHuGgJhgu2NWtKrMoP0Ttd+hhdw=";
   };
@@ -19,11 +19,11 @@ buildGoModule rec {
 
   subPackages = [ "." ];
 
-  meta = with lib; {
+  meta = {
     description = "CLI tool to generate terraform files from existing infrastructure (reverse Terraform). Infrastructure to Code";
     mainProgram = "terraformer";
     homepage = "https://github.com/GoogleCloudPlatform/terraformer";
-    license = licenses.asl20;
-    maintainers = [ ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ ryan4yin ];
   };
 }

@@ -8,7 +8,10 @@
   fontconfig,
   freetype,
   libGL,
-  xorg,
+  libxrandr,
+  libxi,
+  libxcursor,
+  libx11,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -17,13 +20,12 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "vv9k";
-    repo = pname;
+    repo = "epick";
     # Upstream has rewritten tags on multiple occasions.
     rev = "14ee92e049780406fffdc1e4a83bf1433775663f";
     sha256 = "sha256-gjqAQrGJ9KFdzn2a3fOgu0VJ9zrX5stsbzriOGJaD/4=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-r/0aNzU8jm2AqiZWq4plxXY/H7qKVC8nEI9BwOUKCdA=";
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
@@ -34,10 +36,10 @@ rustPlatform.buildRustPackage rec {
     expat
     fontconfig
     freetype
-    xorg.libX11
-    xorg.libXcursor
-    xorg.libXi
-    xorg.libXrandr
+    libx11
+    libxcursor
+    libxi
+    libxrandr
   ];
 
   postInstall = ''
@@ -50,12 +52,12 @@ rustPlatform.buildRustPackage rec {
     patchelf $out/bin/epick --add-rpath ${lib.makeLibraryPath [ libGL ]}
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Simple color picker that lets the user create harmonic palettes with ease";
     homepage = "https://github.com/vv9k/epick";
     changelog = "https://github.com/vv9k/epick/blob/${version}/CHANGELOG.md";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ figsoda ];
+    license = lib.licenses.gpl3Only;
+    maintainers = [ ];
     mainProgram = "epick";
   };
 }

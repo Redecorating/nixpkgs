@@ -1,7 +1,6 @@
 {
   lib,
   buildPythonPackage,
-  pythonOlder,
   fetchFromGitHub,
 
   # build-system
@@ -31,16 +30,14 @@
 
 buildPythonPackage rec {
   pname = "albumentations";
-  version = "2.0.7";
+  version = "2.0.8";
   pyproject = true;
-
-  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "albumentations-team";
     repo = "albumentations";
     tag = version;
-    hash = "sha256-3obvlYj+UwniEf+NokJDNqMysCGFXcJdI1Wckdfng2Y=";
+    hash = "sha256-8vUipdkIelRtKwMw63oUBDN/GUI0gegMGQaqDyXAOTQ=";
   };
 
   patches = [

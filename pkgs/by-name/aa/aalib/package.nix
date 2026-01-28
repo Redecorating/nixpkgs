@@ -28,15 +28,18 @@ stdenv.mkDerivation rec {
     ./clang.patch
     # Fix build against opaque aalib API
     ./ncurses-6.5.patch
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ ./darwin.patch ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ ./darwin.patch ];
 
   # The fuloong2f is not supported by aalib still
   preConfigure = ''
-    configureFlagsArray+=(
-      "--bindir=$bin/bin"
-      "--includedir=$dev/include"
+    # The configure script does the correct thing when 'system' is already set
+    # Export it explicitly in case __structuredAttrs is true.
+    export system
+    appendToVar configureFlags \
+      "--bindir=$bin/bin" \
+      "--includedir=$dev/include" \
       "--libdir=$out/lib"
-    )
   '';
 
   buildInputs = [ ncurses ];
@@ -53,7 +56,7 @@ stdenv.mkDerivation rec {
   postInstall = ''
     mkdir -p $dev/bin
     mv $bin/bin/aalib-config $dev/bin/aalib-config
-    substituteInPlace $out/lib/libaa.la --replace "${ncurses.dev}/lib" "${ncurses.out}/lib"
+    substituteInPlace $out/lib/libaa.la --replace-fail "${ncurses.dev}/lib" "${ncurses.out}/lib"
   '';
 
   meta = {

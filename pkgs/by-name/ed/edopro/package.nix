@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
   fetchzip,
   makeWrapper,
   premake5,
@@ -37,11 +38,10 @@
   zenity,
   covers_url ? "https://pics.projectignis.org:2096/pics/cover/{}.jpg",
   fields_url ? "https://pics.projectignis.org:2096/pics/field/{}.png",
-  # While ygoprodeck has higher quality images, "spamming" of their api results in a ban.
-  # Thats why this link can change since it's compiled into the program, However it will
-  # download assets when needed so it is unlikely to get banned. Unless you search the
-  # card list with no filters of any kind. When testing use ProjectIgnis' website instead.
-  pics_url ? "https://images.ygoprodeck.com/images/cards/{}.jpg",
+  # While ygoprodeck has higher quality images:
+  # 1. automated downloads for sims via their API are discouraged by the owner
+  # 2. images for prerelease cards are unavailable on their service
+  pics_url ? "https://pics.projectignis.org:2096/pics/{}.jpg",
 }:
 let
   archLabel =
@@ -215,6 +215,16 @@ let
       openal
       SDL2
       sqlite
+    ];
+
+    patches = [
+      # fmt::localtime was deprecated and removed
+      # Remove when version > 41.0.2
+      (fetchpatch {
+        name = "0001-edopro-No-longer-depend-on-fmt-for-localtime.patch";
+        url = "https://github.com/edo9300/edopro/commit/c40951ba09f8a8b88d1d4b9b15ca9338da01522c.patch";
+        hash = "sha256-wiZRCwSTp9/G97a+zaYjJgmDrc57/5bSBSYur1dcTfA=";
+      })
     ];
 
     # nixpkgs' gcc stack currently appears to not support LTO

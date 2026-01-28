@@ -33,6 +33,7 @@
   libdrm,
   libpng,
   libuuid,
+  libsecret,
   libX11,
   libxcb,
   libxkbcommon,
@@ -69,7 +70,8 @@
   runCommand,
   wayland,
   xkeyboard_config,
-  xorg,
+  libsm,
+  libice,
   zlib,
   makeDesktopItem,
   tiling_wm, # if we are using a tiling wm, need to set _JAVA_AWT_WM_NONREPARENTING in wrapper
@@ -79,11 +81,11 @@
 }:
 
 let
-  drvName = "android-studio-${channel}-${version}";
   filename = "android-studio-${version}-linux.tar.gz";
 
   androidStudio = stdenv.mkDerivation {
-    name = "${drvName}-unwrapped";
+    pname = "${pname}-unwrapped";
+    inherit version;
 
     src = fetchurl {
       url = "https://dl.google.com/dl/android/studio/ide-zips/${version}/${filename}";
@@ -130,6 +132,7 @@ let
             git
             ps
             usbutils
+            libsecret
           ]
         }" \
         --prefix LD_LIBRARY_PATH : "${
@@ -142,6 +145,7 @@ let
             libXi
             libXrender
             libXtst
+            libsecret
 
             # No crash, but attempted to load at startup
             e2fsprogs
@@ -172,8 +176,8 @@ let
             xcbutilkeysyms
             xcbutilimage
             xcbutilcursor
-            xorg.libICE
-            xorg.libSM
+            libice
+            libsm
             libxkbfile
             libXcomposite
             libXcursor
@@ -225,7 +229,7 @@ let
   # (e.g. `mksdcard`) have `/lib/ld-linux.so.2` set as the interpreter. An FHS
   # environment is used as a work around for that.
   fhsEnv = buildFHSEnv {
-    pname = "${drvName}-fhs-env";
+    pname = "${pname}-fhs-env";
     inherit version;
     multiPkgs = pkgs: [
       ncurses5
@@ -242,8 +246,9 @@ let
       androidStudio,
       androidSdk ? null,
     }:
-    runCommand drvName
+    runCommand "${pname}-${version}"
       {
+        inherit pname version;
         startScript =
           let
             hasAndroidSdk = androidSdk != null;
@@ -280,7 +285,7 @@ let
                 unset ANDROID_HOME
               fi
             ''}
-            exec ${fhsEnv}/bin/${drvName}-fhs-env ${lib.getExe androidStudio} "$@"
+            exec ${lib.getExe fhsEnv} ${lib.getExe androidStudio} "$@"
           '';
         preferLocalBuild = true;
         allowSubstitutes = false;
@@ -289,7 +294,6 @@ let
             withSdk = androidSdk: mkAndroidStudioWrapper { inherit androidStudio androidSdk; };
           in
           {
-            inherit version;
             unwrapped = androidStudio;
             full = withSdk androidenv.androidPkgs.androidsdk;
             inherit withSdk;
@@ -344,7 +348,6 @@ let
             ."${channel}";
           mainProgram = pname;
           sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
-          position = "pkgs/applications/editors/android-studio/common.nix:303";
         };
       }
       ''

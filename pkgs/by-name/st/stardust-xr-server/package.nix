@@ -11,7 +11,8 @@
   libgbm,
   openxr-loader,
   pkg-config,
-  xorg,
+  libxfixes,
+  libx11,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -25,7 +26,6 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-sCatpWDdy7NFWOWUARjN3fZMDVviX2iV79G0HTxfYZU=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-jCtMCZG3ku30tabTnVdGfgcLl5DoqhkJpLKPPliJgDU=";
 
   nativeBuildInputs = [
@@ -40,8 +40,8 @@ rustPlatform.buildRustPackage rec {
     libxkbcommon
     libgbm
     openxr-loader
-    xorg.libX11
-    xorg.libXfixes
+    libx11
+    libxfixes
   ];
 
   CPM_SOURCE_CACHE = "./build";

@@ -2,25 +2,30 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  fetchpatch,
+  fetchpatch2,
+
+  # build system
+  setuptools,
 
   # dependencies
+  absl-py,
   array-record,
-  dill,
   dm-tree,
-  future,
+  etils,
   immutabledict,
   importlib-resources,
   numpy,
   promise,
   protobuf,
   psutil,
+  pyarrow,
   requests,
   simple-parsing,
-  six,
   tensorflow-metadata,
   termcolor,
+  toml,
   tqdm,
+  wrapt,
 
   # tests
   apache-beam,
@@ -28,6 +33,7 @@
   click,
   cloudpickle,
   datasets,
+  dill,
   ffmpeg,
   imagemagick,
   jax,
@@ -56,45 +62,53 @@
   zarr,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "tensorflow-datasets";
-  version = "4.9.8";
+  version = "4.9.9";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "tensorflow";
     repo = "datasets";
-    tag = "v${version}";
-    hash = "sha256-nqveZ+8b0f5sGIn6WufKeA37yEsZjzhCIbCfwMZ9JOM=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-ZXaPYmj8aozfe6ygzKybId8RZ1TqPuIOSpd8XxnRHus=";
   };
 
   patches = [
-    # mlmlcroissant uses encoding_formats, not encoding_formats.
-    # Backport https://github.com/tensorflow/datasets/pull/11037 until released.
-    (fetchpatch {
-      url = "https://github.com/tensorflow/datasets/commit/92cbcff725a1036569a515cc3356aa8480740451.patch";
-      hash = "sha256-2hnMvQP83+eAJllce19aHujcoWQzUz3+LsasWCo4BtM=";
+    # TypeError: Cannot handle this data type: (1, 1, 4), <u2
+    # Issue: https://github.com/tensorflow/datasets/issues/11148
+    # PR: https://github.com/tensorflow/datasets/pull/11149
+    (fetchpatch2 {
+      name = "fix-pillow-12-compat";
+      url = "https://github.com/tensorflow/datasets/pull/11149/commits/21062d65b33978f2263443280c03413add5c0224.patch";
+      hash = "sha256-GWb+1E5lQNhFVp57sqjp+WqzZSva1AGpXe9fbvXXeIA=";
     })
   ];
 
+  build-system = [ setuptools ];
+
   dependencies = [
+    absl-py
     array-record
-    dill
     dm-tree
-    future
+    etils
     immutabledict
     importlib-resources
     numpy
     promise
     protobuf
     psutil
+    pyarrow
     requests
     simple-parsing
-    six
     tensorflow-metadata
     termcolor
+    toml
     tqdm
-  ];
+    wrapt
+  ]
+  ++ etils.optional-dependencies.epath
+  ++ etils.optional-dependencies.etree;
 
   pythonImportsCheck = [ "tensorflow_datasets" ];
 
@@ -104,6 +118,7 @@ buildPythonPackage rec {
     click
     cloudpickle
     datasets
+    dill
     ffmpeg
     imagemagick
     jax
@@ -130,12 +145,6 @@ buildPythonPackage rec {
     tensorflow
     tifffile
     zarr
-  ];
-
-  pytestFlagsArray = [
-    # AttributeError: 'NoneType' object has no attribute 'Table'
-    "--deselect=tensorflow_datasets/core/file_adapters_test.py::test_read_write"
-    "--deselect=tensorflow_datasets/text/c4_wsrs/c4_wsrs_test.py::C4WSRSTest"
   ];
 
   disabledTests = [
@@ -202,13 +211,17 @@ buildPythonPackage rec {
     # Require `gcld3` and `nltk.punkt` which are not packaged in `nixpkgs`.
     "tensorflow_datasets/text/c4_test.py"
     "tensorflow_datasets/text/c4_utils_test.py"
+
+    # AttributeError: 'NoneType' object has no attribute 'Table'
+    "tensorflow_datasets/core/file_adapters_test.py::test_read_write"
+    "tensorflow_datasets/text/c4_wsrs/c4_wsrs_test.py::C4WSRSTest"
   ];
 
   meta = {
     description = "Library of datasets ready to use with TensorFlow";
     homepage = "https://www.tensorflow.org/datasets/overview";
-    changelog = "https://github.com/tensorflow/datasets/releases/tag/v${version}";
+    changelog = "https://github.com/tensorflow/datasets/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [ ndl ];
   };
-}
+})

@@ -3,19 +3,16 @@ let
   rcon-pass = "foobar";
   rcon-port = 43000;
 in
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   name = "minecraft-server";
-  meta = with pkgs.lib.maintainers; {
-    maintainers = [ nequissimus ];
-  };
+
+  node.pkgsReadOnly = false;
 
   nodes.server =
     { ... }:
     {
       environment.systemPackages = [ pkgs.mcrcon ];
-
-      nixpkgs.config.allowUnfree = true;
 
       services.minecraft-server = {
         declarative = true;

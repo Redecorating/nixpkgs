@@ -10,20 +10,19 @@
 
 buildPythonPackage rec {
   pname = "pcodec";
-  version = "0.4.2";
+  version = "1.0.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pcodec";
     repo = "pcodec";
     tag = "v${version}";
-    hash = "sha256-xWGtTtjMz62LnZDpBtp3HWPW9JgDovObUVSxWM3t1Ng=";
+    hash = "sha256-WE71Xbr0iUsnP5oqqMlvXzIhasQ7YQm6rB8hEA6FvnM=";
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit src;
-    name = "${pname}-${version}";
-    hash = "sha256-91p0eoVRzc9S8pHRhAlRey4k4jW9IMttiH+9Joh91IQ=";
+    inherit pname version src;
+    hash = "sha256-h40rlCd/qyf3hbvm8EdWo1hqAgiiwExmWNnKgU3iYEU=";
   };
 
   buildAndTestSubdir = "pco_python";

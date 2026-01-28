@@ -7,7 +7,7 @@
 python3.pkgs.buildPythonApplication rec {
   pname = "hstsparser";
   version = "1.2.0";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "thebeanogamer";
@@ -28,12 +28,12 @@ python3.pkgs.buildPythonApplication rec {
     "hstsparser"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Tool to parse Firefox and Chrome HSTS databases into forensic artifacts";
     mainProgram = "hstsparser";
     homepage = "https://github.com/thebeanogamer/hstsparser";
     changelog = "https://github.com/thebeanogamer/hstsparser/releases/tag/${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
   };
 }

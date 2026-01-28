@@ -12,7 +12,14 @@
   uthash,
   which,
   xnee,
-  xorg,
+  libxrender,
+  libxrandr,
+  libxpm,
+  libxmu,
+  libxft,
+  libx11,
+  xprop,
+  xeyes,
   python3Packages,
 }:
 
@@ -24,7 +31,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "sagb";
     repo = "alttab";
-    rev = "v${version}";
+    tag = "v${version}";
     sha256 = "sha256-1+hk0OeSriXPyefv3wOgeiW781PL4VP5Luvt+RS5jmg=";
   };
 
@@ -40,12 +47,12 @@ stdenv.mkDerivation rec {
   buildInputs = [
     libpng
     uthash
-    xorg.libX11
-    xorg.libXft
-    xorg.libXmu
-    xorg.libXpm
-    xorg.libXrandr
-    xorg.libXrender
+    libx11
+    libxft
+    libxmu
+    libxpm
+    libxrandr
+    libxrender
   ];
 
   enableParallelBuilding = true;
@@ -58,15 +65,15 @@ stdenv.mkDerivation rec {
     python3Packages.xvfbwrapper
     which
     xnee
-    xorg.xeyes
-    xorg.xprop
+    xeyes
+    xprop
   ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/sagb/alttab";
     description = "X11 window switcher designed for minimalistic window managers or standalone X11 session";
-    license = licenses.gpl3Plus;
-    platforms = platforms.all;
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.all;
     maintainers = [ ];
     mainProgram = "alttab";
   };

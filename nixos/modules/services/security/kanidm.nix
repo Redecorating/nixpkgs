@@ -29,6 +29,7 @@ let
     mkIf
     mkMerge
     mkOption
+    mkOrder
     mkPackageOption
     optional
     optionals
@@ -54,26 +55,22 @@ let
     ++ optional (cfg.provision.extraJsonFile != null) cfg.provision.extraJsonFile
     ++ mapAttrsToList (_: x: x.basicSecretFile) cfg.provision.systems.oauth2
   );
-  secretDirectories = unique (
-    map builtins.dirOf (
-      [
-        cfg.serverSettings.tls_chain
-        cfg.serverSettings.tls_key
-      ]
-      ++ optionals cfg.provision.enable provisionSecretFiles
-    )
-  );
+  secretPaths = [
+    cfg.serverSettings.tls_chain
+    cfg.serverSettings.tls_key
+  ]
+  ++ optionals cfg.provision.enable provisionSecretFiles;
+  enableServerBackup = cfg.enableServer && (cfg.serverSettings.online_backup.versions != 0);
 
   # Merge bind mount paths and remove paths where a prefix is already mounted.
   # This makes sure that if e.g. the tls_chain is in the nix store and /nix/store is already in the mount
   # paths, no new bind mount is added. Adding subpaths caused problems on ofborg.
-  hasPrefixInList =
-    list: newPath: any (path: hasPrefix (builtins.toString path) (builtins.toString newPath)) list;
+  hasPrefixInList = list: newPath: any (path: hasPrefix (toString path) (toString newPath)) list;
   mergePaths = foldl' (
     merged: newPath:
     let
       # If the new path is a prefix to some existing path, we need to filter it out
-      filteredPaths = filter (p: !hasPrefix (builtins.toString newPath) (builtins.toString p)) merged;
+      filteredPaths = filter (p: !hasPrefix (toString newPath) (toString p)) merged;
       # If a prefix of the new path is already in the list, do not add it
       filteredNew = optional (!hasPrefixInList filteredPaths newPath) newPath;
     in
@@ -185,7 +182,9 @@ let
 
   finalJson =
     if cfg.provision.extraJsonFile != null then
-      "<(${lib.getExe pkgs.jq} -s '.[0] * .[1]' ${provisionStateJson} ${cfg.provision.extraJsonFile})"
+      ''
+        <(${lib.getExe pkgs.yq-go} '. *+ load("${cfg.provision.extraJsonFile}") | (.. | select(type == "!!seq")) |= unique' ${provisionStateJson})
+      ''
     else
       provisionStateJson;
 
@@ -203,7 +202,7 @@ let
         echo "Tried for at least 30 seconds, giving up..."
         exit 1
       fi
-      count=$((count++))
+      count=$((++count))
     done
 
     ${recoverIdmAdmin}
@@ -369,7 +368,7 @@ in
         freeformType = settingsFormat.type;
 
         options = {
-          pam_allowed_login_groups = mkOption {
+          kanidm.pam_allowed_login_groups = mkOption {
             description = "Kanidm groups that are allowed to login using PAM.";
             example = "my_pam_group";
             type = types.listOf types.str;
@@ -395,7 +394,7 @@ in
       instanceUrl = mkOption {
         description = "The instance url to which the provisioning tool should connect.";
         default = "https://localhost:${serverPort}";
-        defaultText = ''"https://localhost:<port from serverSettings.bindaddress>"'';
+        defaultText = "https://localhost:<port from serverSettings.bindaddress>";
         type = types.str;
       };
 
@@ -442,10 +441,8 @@ in
         description = ''
           A JSON file for provisioning persons, groups & systems.
           Options set in this file take precedence over values set using the other options.
-          In the case of duplicates, `jq` will remove all but the last one
-          when merging this file with the options.
+          The files get deeply merged, and deduplicated.
           The accepted JSON schema can be found at <https://github.com/oddlama/kanidm-provision#json-schema>.
-          Note: theoretically `jq` cannot merge nested types, but this does not pose an issue as kanidm-provision's JSON scheme does not use nested types.
         '';
         type = types.nullOr types.path;
         default = null;
@@ -464,6 +461,17 @@ in
                 type = types.listOf types.str;
                 apply = unique;
                 default = [ ];
+              };
+
+              overwriteMembers = mkOption {
+                description = ''
+                  Whether the member list should be overwritten each time (true) or appended
+                  (false). Append mode allows interactive group management in addition to the
+                  declared members. Also, future member removals cannot be reflected
+                  automatically in append mode.
+                '';
+                type = types.bool;
+                default = true;
               };
             };
             config.members = concatLists (
@@ -541,7 +549,7 @@ in
                 description = "The redirect URL of the service. These need to exactly match the OAuth2 redirect target";
                 type =
                   let
-                    originStrType = types.strMatching ".*://.*$";
+                    originStrType = types.strMatching ".*://?.*$";
                   in
                   types.either originStrType (types.nonEmptyListOf originStrType);
                 example = "https://someservice.example.com/auth/login";
@@ -664,6 +672,12 @@ in
   };
 
   config = mkIf (cfg.enableClient || cfg.enableServer || cfg.enablePam) {
+    warnings = lib.optionals (cfg.package.eolMessage != "") [ cfg.package.eolMessage ];
+    services.kanidm = {
+      unixSettings.version = "2";
+      serverSettings.version = "2";
+    };
+
     assertions =
       let
         entityList =
@@ -700,6 +714,14 @@ in
           };
       in
       [
+        {
+          assertion = cfg.enablePam -> !(cfg.unixSettings ? pam_allowed_login_groups);
+          message = ''
+            <option>services.kanidm.unixSettings.pam_allowed_login_groups</option> has been renamed
+            to <option>services.kanidm.unixSettings.kanidm.pam_allowed_login_groups</option>.
+            Please change your usage.
+          '';
+        }
         {
           assertion =
             !cfg.enableServer
@@ -767,7 +789,7 @@ in
             -> cfg.package.enableSecretProvisioning;
           message = ''
             Specifying an admin account password or oauth2 basicSecretFile requires kanidm to be built with the secret provisioning patches.
-            You may want to set `services.kanidm.package = pkgs.kanidmWithSecretProvisioning;`.
+            You may want to set `services.kanidm.package = pkgs.kanidm.withSecretProvisioning;`.
           '';
         }
         # Entity names must be globally unique:
@@ -864,7 +886,7 @@ in
 
     environment.systemPackages = mkIf cfg.enableClient [ cfg.package ];
 
-    systemd.tmpfiles.settings."10-kanidm" = {
+    systemd.tmpfiles.settings."10-kanidm" = mkIf enableServerBackup {
       ${cfg.serverSettings.online_backup.path}.d = {
         mode = "0700";
         user = "kanidm";
@@ -881,7 +903,14 @@ in
         (
           defaultServiceConfig
           // {
-            BindReadOnlyPaths = mergePaths (defaultServiceConfig.BindReadOnlyPaths ++ secretDirectories);
+            BindReadOnlyPaths = mergePaths (
+              defaultServiceConfig.BindReadOnlyPaths
+              ++ secretPaths
+              ++ (lib.optionals (cfg.provision.enable && !cfg.provision.acceptInvalidCerts) [
+                "-/etc/ssl"
+                "-/etc/static/ssl"
+              ])
+            );
           }
         )
         {
@@ -894,12 +923,9 @@ in
           Group = "kanidm";
 
           BindPaths =
-            [
-              # To create the socket
-              "/run/kanidmd:/run/kanidmd"
-              # To store backups
-              cfg.serverSettings.online_backup.path
-            ]
+            [ ]
+            # To store backups
+            ++ optional enableServerBackup cfg.serverSettings.online_backup.path
             ++ optional (
               cfg.enablePam && cfg.unixSettings ? home_mount_prefix
             ) cfg.unixSettings.home_mount_prefix;
@@ -983,6 +1009,9 @@ in
           "-/etc/resolv.conf"
           "-/etc/nsswitch.conf"
           "-/etc/hosts"
+          "-/etc/passwd"
+          "-/etc/group"
+          "-/etc/shadow"
           "-/etc/localtime"
           "-/etc/kanidm"
           "-/etc/static/kanidm"
@@ -1023,8 +1052,9 @@ in
 
     system.nssModules = mkIf cfg.enablePam [ cfg.package ];
 
-    system.nssDatabases.group = optional cfg.enablePam "kanidm";
-    system.nssDatabases.passwd = optional cfg.enablePam "kanidm";
+    # Needs to be before "files" which is `mkBefore`
+    system.nssDatabases.group = mkOrder 490 (optional cfg.enablePam "kanidm");
+    system.nssDatabases.passwd = mkOrder 490 (optional cfg.enablePam "kanidm");
 
     users.groups = mkMerge [
       (mkIf cfg.enableServer { kanidm = { }; })

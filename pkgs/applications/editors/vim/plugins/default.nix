@@ -45,8 +45,9 @@ let
 
   plugins = callPackage ./generated.nix {
     inherit buildVimPlugin;
-    inherit (neovimUtils) buildNeovimPlugin;
   };
+
+  corePlugins = callPackage ./corePlugins.nix { };
 
   # TL;DR
   # * Add your plugin to ./vim-plugin-names
@@ -55,7 +56,6 @@ let
   # If additional modifications to the build process are required,
   # add to ./overrides.nix.
   overrides = callPackage ./overrides.nix {
-    inherit buildVimPlugin;
     inherit llvmPackages;
   };
 
@@ -67,6 +67,7 @@ lib.pipe initialPackages [
   (extends luaPackagePlugins)
   (extends nodePackagePlugins)
   (extends nonGeneratedPlugins)
+  (extends corePlugins)
   (extends overrides)
   (extends aliases)
   lib.makeExtensible

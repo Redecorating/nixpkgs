@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ lib, ... }:
 
 let
   # Settings for both servers and agents
@@ -57,8 +57,6 @@ let
       ];
       networking.firewall = firewallSettings;
 
-      nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "consul" ];
-
       services.consul = {
         enable = true;
         inherit webUi;
@@ -87,8 +85,6 @@ let
       ];
       networking.firewall = firewallSettings;
 
-      nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "consul" ];
-
       services.consul =
         assert builtins.elem thisConsensusServerHost allConsensusServerHosts;
         {
@@ -116,6 +112,8 @@ let
 in
 {
   name = "consul";
+
+  node.pkgsReadOnly = false;
 
   nodes = {
     server1 = server 0;

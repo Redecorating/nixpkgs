@@ -6,7 +6,7 @@
   perl,
   python3,
   openssl,
-  xorg,
+  libxcb-util,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "kdash-rs";
-    repo = pname;
+    repo = "kdash";
     rev = "v${version}";
     sha256 = "sha256-fFpdWVoeWycnp/hRw2S+hYpnXYmCs+rLqcZdmSSMGwI=";
   };
@@ -28,17 +28,19 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     openssl
-    xorg.xcbutil
+    libxcb-util
   ];
 
-  useFetchCargoVendor = true;
+  # Fix for build failure with gcc15
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
   cargoHash = "sha256-72DuM64wj8WW6soagodOFIeHvVn1CPpb1T3Y7GQYsbs=";
 
-  meta = with lib; {
+  meta = {
     description = "Simple and fast dashboard for Kubernetes";
     mainProgram = "kdash";
     homepage = "https://github.com/kdash-rs/kdash";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ matthiasbeyer ];
+    license = with lib.licenses; [ mit ];
+    maintainers = with lib.maintainers; [ matthiasbeyer ];
   };
 }

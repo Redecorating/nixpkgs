@@ -10,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "anned20";
-    repo = pname;
+    repo = "kicli";
     rev = "v${version}";
     hash = "sha256-NXKo+zK5HnuMXRsi29lEhoo7RCagwvZdXXPNfp4pHtc=";
   };
@@ -19,12 +19,12 @@ buildGoModule rec {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/anned20/kicli";
     description = "CLI interface to the Kimai time tracking project";
-    license = licenses.mit;
-    maintainers = with maintainers; [ poelzi ];
-    platforms = platforms.all;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ poelzi ];
+    platforms = lib.platforms.all;
     mainProgram = "kicli";
   };
 }

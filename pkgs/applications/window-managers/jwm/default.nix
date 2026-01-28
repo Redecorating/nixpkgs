@@ -22,7 +22,7 @@
   pango,
   pkg-config,
   which,
-  xorg,
+  libxrender,
   xorgproto,
   gitUpdater,
 }:
@@ -62,9 +62,13 @@ stdenv.mkDerivation rec {
     libpng
     librsvg
     pango
-    xorg.libXrender
+    libxrender
     xorgproto
   ];
+
+  postPatch = ''
+    sed -i '/AM_ICONV/i AC_CONFIG_MACRO_DIRS([m4])' configure.ac
+  '';
 
   preConfigure = "NOCONFIGURE=1 ./autogen.sh";
 

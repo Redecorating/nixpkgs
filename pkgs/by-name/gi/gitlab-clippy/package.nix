@@ -14,13 +14,13 @@ rustPlatform.buildRustPackage rec {
     rev = version;
     hash = "sha256-d7SmlAWIV4SngJhIvlud90ZUSF55FWIrzFpkfSXIy2Y=";
   };
-  useFetchCargoVendor = true;
+
   cargoHash = "sha256-O3Pey0XwZITePTiVHrG5EVZpIp96sRWjUf1vzZ/JnCw=";
 
-  # TODO re-add theses tests once they get fixed in upstream
+  # TODO re-add these tests once they get fixed in upstream
   checkFlags = [
-    "--skip cli::converts_error_from_pipe"
-    "--skip cli::converts_warnings_from_pipe"
+    "--skip=cli::converts_error_from_pipe"
+    "--skip=cli::converts_warnings_from_pipe"
   ];
 
   meta = {

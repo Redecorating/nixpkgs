@@ -56,7 +56,8 @@ in
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-      } // (builtins.mapAttrs (_: val: toString val) cfg.settings);
+      }
+      // (builtins.mapAttrs (_: val: toString val) cfg.settings);
 
       serviceConfig = {
         DynamicUser = true;
@@ -64,7 +65,7 @@ in
         StandardOutput = "journal";
         BindPaths = "${cfg.dataDir}:/data";
         PrivateTmp = true;
-        ExecStart = "${lib.getExe pkgs.ifm-web} ${lib.escapeShellArg cfg.listenAddress} ${builtins.toString cfg.port} /data";
+        ExecStart = "${lib.getExe pkgs.ifm-web} ${lib.escapeShellArg cfg.listenAddress} ${toString cfg.port} /data";
       };
     };
   };

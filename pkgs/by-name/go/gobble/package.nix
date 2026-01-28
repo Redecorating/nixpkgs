@@ -2,7 +2,7 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
-  xorg,
+  libxcb,
   installShellFiles,
   pandoc,
 }:
@@ -18,10 +18,9 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-g4154Axvjp9jbE0lvMeNGM+v2UxkAsZqt9kPv5bhVK8=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-DnIZTeRyxhmVK2uB21ScPiEyL4k9kAWfVoLNIAM9P68=";
 
-  buildInputs = [ xorg.libxcb ];
+  buildInputs = [ libxcb ];
   nativeBuildInputs = [
     pandoc
     installShellFiles
@@ -33,7 +32,7 @@ rustPlatform.buildRustPackage rec {
   '';
 
   meta = {
-    description = "gobbles your terminal";
+    description = "Rust rewrite of Devour";
     homepage = "https://github.com/EmperorPenguin18/gobble";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [ vuimuich ];

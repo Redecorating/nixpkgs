@@ -1,7 +1,6 @@
 {
   lib,
   stdenv,
-  fetchzip,
   fetchFromGitHub,
   cmake,
   zlib,
@@ -11,22 +10,23 @@
   scipopt-papilo,
   scipopt-zimpl,
   ipopt,
-  tbb_2021_11,
+  onetbb,
   boost,
   gfortran,
   criterion,
   mpfr,
+  enableZimpl ? (!stdenv.hostPlatform.isDarwin),
 }:
 
 stdenv.mkDerivation rec {
   pname = "scipopt-scip";
-  version = "9.2.2";
+  version = "10.0.0";
 
   src = fetchFromGitHub {
     owner = "scipopt";
     repo = "scip";
-    tag = "v${lib.replaceStrings [ "." ] [ "" ] version}";
-    hash = "sha256-gxR308XrlmuUym/ujwGcD9a7Z+Z7vQNHaK4zO/PWPBQ=";
+    tag = "v${version}";
+    hash = "sha256-KW7N2ORspzkaR/gdU//p38BV4GyuhoSIVb6q9RTrCYQ=";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -34,19 +34,20 @@ stdenv.mkDerivation rec {
   buildInputs = [
     scipopt-soplex
     scipopt-papilo
-    scipopt-zimpl
     ipopt
     gmp
     readline
     zlib
-    tbb_2021_11
+    onetbb
     boost
     gfortran
     criterion
-    mpfr # if not included, throws fatal error: mpfr.h not found
-  ];
+  ]
+  ++ lib.optional enableZimpl scipopt-zimpl;
 
-  cmakeFlags = [ ];
+  cmakeFlags = lib.optional (!enableZimpl) "-DZIMPL=OFF";
+
+  propagatedBuildInputs = [ mpfr ];
 
   doCheck = true;
 

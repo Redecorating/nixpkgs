@@ -7,7 +7,7 @@
   qtvirtualkeyboard,
   qtwayland,
   libinput,
-  xorg,
+  libxcvt,
   xwayland,
   libcanberra,
   libdisplay-info,
@@ -17,15 +17,12 @@
   pipewire,
   krunner,
   python3,
+  fetchpatch,
 }:
 mkKdeDerivation {
   pname = "kwin";
 
   patches = [
-    # Follow symlinks when searching for aurorae configs
-    # FIXME(later): upstream?
-    ./0001-follow-symlinks.patch
-    # The rest are NixOS-specific hacks
     ./0003-plugins-qpa-allow-using-nixos-wrapper.patch
     ./0001-NixOS-Unwrap-executable-name-for-.desktop-search.patch
     ./0001-Lower-CAP_SYS_NICE-from-the-ambient-set.patch
@@ -62,7 +59,7 @@ mkKdeDerivation {
     libinput
     pipewire
 
-    xorg.libxcvt
+    libxcvt
     # we need to provide this so it knows our xwayland supports new features
     xwayland
   ];

@@ -5,7 +5,7 @@
   ninja,
   python3,
   weston,
-  xorg,
+  xauth,
   xwayland,
   withCage ? false,
   cage,
@@ -17,12 +17,13 @@
   dbus, # Since 0.0.3, mutter compositors run with their own DBUS sessions
 }:
 let
-  compositors =
-    [ weston ]
-    ++ lib.optional withCage cage
-    ++ lib.optional withKwin kdePackages.kwin
-    ++ lib.optional withMutter gnome.mutter
-    ++ lib.optional withDbus dbus;
+  compositors = [
+    weston
+  ]
+  ++ lib.optional withCage cage
+  ++ lib.optional withKwin kdePackages.kwin
+  ++ lib.optional withMutter gnome.mutter
+  ++ lib.optional withDbus dbus;
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "xwayland-run";
@@ -55,7 +56,7 @@ python3.pkgs.buildPythonApplication rec {
       --prefix PATH : ${
         lib.makeBinPath [
           xwayland
-          xorg.xauth
+          xauth
         ]
       }
     wrapProgram $out/bin/xwfb-run \
@@ -64,7 +65,7 @@ python3.pkgs.buildPythonApplication rec {
           compositors
           ++ [
             xwayland
-            xorg.xauth
+            xauth
           ]
         )
       }

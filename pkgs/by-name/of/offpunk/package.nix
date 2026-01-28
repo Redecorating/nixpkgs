@@ -14,39 +14,36 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "offpunk";
-  version = "2.7.1";
+  version = "2.8";
   pyproject = true;
-
-  disabled = python3Packages.pythonOlder "3.7";
 
   src = fetchFromSourcehut {
     owner = "~lioploum";
     repo = "offpunk";
     rev = "v${version}";
-    hash = "sha256-+Mbe1VLeF8Adf7bgVnbzvcWdPB4PXakCD9gO35jAYBY=";
+    hash = "sha256-s/pEN7n/g9o8a/hYTC39PgbBLyCUwN5LIggqUSMKRS4=";
   };
 
   build-system = with python3Packages; [ hatchling ];
 
   nativeBuildInputs = [ installShellFiles ];
 
-  dependencies =
-    [
-      file
-      less
-      timg
-      xdg-utils
-      xsel
-    ]
-    ++ (with python3Packages; [
-      beautifulsoup4
-      chardet
-      cryptography
-      feedparser
-      readability-lxml
-      requests
-      setproctitle
-    ]);
+  dependencies = [
+    file
+    less
+    timg
+    xdg-utils
+    xsel
+  ]
+  ++ (with python3Packages; [
+    beautifulsoup4
+    chardet
+    cryptography
+    feedparser
+    readability-lxml
+    requests
+    setproctitle
+  ]);
 
   postInstall = ''
     installManPage man/*.1

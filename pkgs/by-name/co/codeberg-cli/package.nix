@@ -9,18 +9,17 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "codeberg-cli";
-  version = "0.4.11";
+  version = "0.5.4";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "Aviac";
     repo = "codeberg-cli";
     rev = "v${version}";
-    hash = "sha256-wf9Ve7focNBo6fGsjBQpTIx+DtxOo73AIQ9uoV8Q88Q=";
+    hash = "sha256-o+Jf9JKDGsnSVV8sJcJddZG+9DBn6DB4HfaxLxxwa+U=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-LmLMTnNwxih5HcrMUmQpVdIVz4KeHxcOFtOrNqgGPkA=";
+  cargoHash = "sha256-HBVswxako/Djv8ayhEfgGVaFWblNn6ngtbQh9jNaxcQ=";
   nativeBuildInputs = [
     pkg-config
     installShellFiles
@@ -35,11 +34,11 @@ rustPlatform.buildRustPackage rec {
       --zsh <($out/bin/berg completion zsh)
   '';
 
-  meta = with lib; {
+  meta = {
     description = "CLI Tool for Codeberg similar to gh and glab";
     homepage = "https://codeberg.org/Aviac/codeberg-cli";
-    license = with licenses; [ agpl3Plus ];
-    maintainers = with maintainers; [ robwalt ];
+    license = with lib.licenses; [ agpl3Plus ];
+    maintainers = with lib.maintainers; [ robwalt ];
     mainProgram = "berg";
   };
 }

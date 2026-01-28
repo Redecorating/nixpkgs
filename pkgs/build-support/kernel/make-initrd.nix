@@ -81,12 +81,6 @@ in
     _compressorMeta.ubootName
       or (throw "Unrecognised compressor ${_compressorName}, please specify uInitrdCompression"),
 }:
-let
-  # !!! Move this into a public lib function, it is probably useful for others
-  toValidStoreName =
-    x: with builtins; lib.concatStringsSep "-" (filter (x: !(isList x)) (split "[^a-zA-Z0-9_=.?-]+" x));
-
-in
 stdenvNoCC.mkDerivation (
   rec {
     inherit
@@ -101,7 +95,8 @@ stdenvNoCC.mkDerivation (
 
     nativeBuildInputs = [
       cpio
-    ] ++ lib.optional makeUInitrd ubootTools;
+    ]
+    ++ lib.optional makeUInitrd ubootTools;
 
     compress = "${_compressorExecutable} ${lib.escapeShellArgs _compressorArgsReal}";
 

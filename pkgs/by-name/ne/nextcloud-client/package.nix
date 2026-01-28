@@ -23,7 +23,7 @@
 
 stdenv.mkDerivation rec {
   pname = "nextcloud-client";
-  version = "3.16.4";
+  version = "4.0.6";
 
   outputs = [
     "out"
@@ -34,7 +34,7 @@ stdenv.mkDerivation rec {
     owner = "nextcloud-releases";
     repo = "desktop";
     tag = "v${version}";
-    hash = "sha256-8P73YitjuU9SGDBNimqJsvSfGOE9lNCVUNN3f4KXWSY=";
+    hash = "sha256-GPNJ2zrHzHQgJvj1ANi6LYsTlkuc5splFAwC5XaR3+0=";
   };
 
   patches = [
@@ -42,6 +42,9 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
+    substituteInPlace CMakeLists.txt \
+      --replace-fail '"''${SYSTEMD_USER_UNIT_DIR}"' "\"$out/lib/systemd/user\""
+
     for file in src/libsync/vfs/*/CMakeLists.txt; do
       substituteInPlace $file \
         --replace-fail "PLUGINDIR" "KDE_INSTALL_PLUGINDIR"
@@ -89,10 +92,6 @@ stdenv.mkDerivation rec {
     "-DMIRALL_VERSION_SUFFIX=" # remove git suffix from version
   ];
 
-  postBuild = ''
-    make doc-man
-  '';
-
   passthru.updateScript = gitUpdater { rev-prefix = "v"; };
 
   meta = {
@@ -101,7 +100,6 @@ stdenv.mkDerivation rec {
     homepage = "https://nextcloud.com";
     license = lib.licenses.gpl2Plus;
     maintainers = with lib.maintainers; [
-      kranzes
       SuperSandro2000
     ];
     platforms = lib.platforms.linux;

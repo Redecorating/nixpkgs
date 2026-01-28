@@ -33,16 +33,15 @@ stdenv.mkDerivation rec {
     ./missing-semicolon.patch
   ];
 
-  postPatch =
-    ''
-      substituteInPlace Makefile \
-        --replace-fail "/usr" "$out" \
-        --replace-fail "mhash; ./configure" "mhash; ./configure --prefix=$out"
-    ''
-    + lib.optionalString stdenv.cc.isClang ''
-      substituteInPlace Makefile \
-        --replace-fail "-lgomp" "-lomp"
-    '';
+  postPatch = ''
+    substituteInPlace Makefile \
+      --replace-fail "/usr" "$out" \
+      --replace-fail "mhash; ./configure" "mhash; ./configure --prefix=$out"
+  ''
+  + lib.optionalString stdenv.cc.isClang ''
+    substituteInPlace Makefile \
+      --replace-fail "-lgomp" "-lomp"
+  '';
 
   strictDeps = true;
 
@@ -63,6 +62,7 @@ stdenv.mkDerivation rec {
   preConfigure = "patchShebangs .";
 
   makeFlags = lib.optionals stdenv.cc.isGNU [
+    "CFLAGS=-std=c17"
     "OPTFLAGS=-fopenmp"
   ];
 

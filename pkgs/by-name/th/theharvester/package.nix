@@ -4,22 +4,19 @@
   python3,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "theharvester";
-  version = "4.7.1";
+  version = "4.10.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "laramies";
     repo = "theharvester";
-    tag = version;
-    hash = "sha256-IBisnQGdhPCoVPPH/GHLJg5qoh08KfMuMxbsqF3jjpE=";
+    tag = finalAttrs.version;
+    hash = "sha256-PDFKDm1amqmdYo/avxudWZ9Xhp16Cw4ejmUAQ+BlvC0=";
   };
 
-  postPatch = ''
-    # Requirements are pinned
-    sed -i 's/==.*//' requirements/base.txt
-  '';
+  pythonRelaxDeps = true;
 
   pythonRemoveDeps = [ "winloop" ];
 
@@ -29,6 +26,7 @@ python3.pkgs.buildPythonApplication rec {
     aiodns
     aiofiles
     aiohttp
+    aiohttp-socks
     aiomultiprocess
     aiosqlite
     beautifulsoup4
@@ -36,19 +34,19 @@ python3.pkgs.buildPythonApplication rec {
     certifi
     dnspython
     fastapi
+    httpx
     lxml
     netaddr
-    ujson
     playwright
     plotly
     pyppeteer
     python-dateutil
     pyyaml
-    requests
     retrying
     shodan
     slowapi
     starlette
+    ujson
     uvicorn
     uvloop
   ];
@@ -65,7 +63,7 @@ python3.pkgs.buildPythonApplication rec {
     runHook postCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Gather E-mails, subdomains and names from different public sources";
     longDescription = ''
       theHarvester is a very simple, yet effective tool designed to be used in the early
@@ -74,13 +72,13 @@ python3.pkgs.buildPythonApplication rec {
       gathers emails, names, subdomains, IPs, and URLs using multiple public data sources.
     '';
     homepage = "https://github.com/laramies/theHarvester";
-    changelog = "https://github.com/laramies/theHarvester/releases/tag/${version}";
-    license = licenses.gpl2Only;
-    maintainers = with maintainers; [
+    changelog = "https://github.com/laramies/theHarvester/releases/tag/${finalAttrs.src.tag}";
+    license = lib.licenses.gpl2Only;
+    maintainers = with lib.maintainers; [
       c0bw3b
       fab
       treemo
     ];
     mainProgram = "theHarvester";
   };
-}
+})

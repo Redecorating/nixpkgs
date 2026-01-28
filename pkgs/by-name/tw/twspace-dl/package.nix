@@ -9,7 +9,7 @@ python3Packages.buildPythonApplication rec {
   pname = "twspace-dl";
   version = "2024.7.2.1";
 
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchPypi {
     inherit version;
@@ -28,11 +28,11 @@ python3Packages.buildPythonApplication rec {
 
   pythonImportsCheck = [ "twspace_dl" ];
 
-  meta = with lib; {
+  meta = {
     description = "Python module to download twitter spaces";
     homepage = "https://github.com/HoloArchivists/twspace-dl";
     changelog = "https://github.com/HoloArchivists/twspace-dl/releases/tag/${version}";
-    license = licenses.gpl2Only;
+    license = lib.licenses.gpl2Only;
     maintainers = [ ];
     mainProgram = "twspace_dl";
   };

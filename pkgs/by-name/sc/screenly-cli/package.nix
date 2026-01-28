@@ -10,17 +10,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "screenly-cli";
-  version = "1.0.3";
+  version = "1.1.0";
 
   src = fetchFromGitHub {
     owner = "screenly";
     repo = "cli";
     tag = "v${version}";
-    hash = "sha256-sRi0CpdaPCH54m2XojicARLXZELB4PFcLLw0KB0j6jE=";
+    hash = "sha256-Icx0Nkn0ScbNTmXllkUj6DPhGqzh8HnIQPpej4ABJac=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-U9NAfColVKbLsEf3HXS4Vu2eNvCjG0+koESFUWP9vMk=";
+  cargoHash = "sha256-XYXWbwuoPqL93R8Bre26kBPxkiXpJ0Dg06cBOyDK8ok=";
 
   nativeBuildInputs = [
     pkg-config
@@ -38,7 +37,6 @@ rustPlatform.buildRustPackage rec {
     license = lib.licenses.mit;
     mainProgram = "screenly";
     maintainers = with lib.maintainers; [
-      jnsgruk
       vpetersson
     ];
   };

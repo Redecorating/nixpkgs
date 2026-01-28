@@ -10,7 +10,7 @@
   pkg-config,
   vala,
   wayland-scanner,
-  wrapGAppsHook3,
+  wrapGAppsHook4,
   at-spi2-core,
   gnome-settings-daemon,
   gnome-desktop,
@@ -18,7 +18,6 @@
   granite7,
   gtk3,
   gtk4,
-  libcanberra,
   libgee,
   libhandy,
   mutter,
@@ -27,22 +26,18 @@
   nix-update-script,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "gala";
-  version = "8.2.2";
+  version = "8.4.0-unstable-2026-01-06";
 
   src = fetchFromGitHub {
     owner = "elementary";
-    repo = pname;
-    rev = version;
-    hash = "sha256-S71NryqJjWXZgyBj6q088bdjt/NnAEJ6oeUO2OMJ3Z4=";
+    repo = "gala";
+    # Contains crash fixes for mutter 48.
+    # nixpkgs-update: no auto update
+    rev = "8fb60a9c9b04245913733208df1c061d6c353a35";
+    hash = "sha256-GBNrcUAC7UBdyrqoja81bD1oVHjLXWhnDz3gtjMbjII=";
   };
-
-  patches = [
-    # We look for plugins in `/run/current-system/sw/lib/` because
-    # there are multiple plugin providers (e.g. gala and wingpanel).
-    ./plugins-dir.patch
-  ];
 
   depsBuildBuild = [ pkg-config ];
 
@@ -55,7 +50,7 @@ stdenv.mkDerivation rec {
     pkg-config
     vala
     wayland-scanner
-    wrapGAppsHook3
+    wrapGAppsHook4
   ];
 
   buildInputs = [
@@ -64,9 +59,8 @@ stdenv.mkDerivation rec {
     gnome-desktop
     granite
     granite7
-    gtk3
-    gtk4 # gala-daemon
-    libcanberra
+    gtk3 # daemon-gtk3
+    gtk4
     libgee
     libhandy
     mutter
@@ -74,16 +68,21 @@ stdenv.mkDerivation rec {
     systemd
   ];
 
+  postPatch = ''
+    substituteInPlace meson.build \
+      --replace-fail "conf.set('PLUGINDIR', plugins_dir)" "conf.set('PLUGINDIR','/run/current-system/sw/lib/gala/plugins')"
+  '';
+
   passthru = {
     updateScript = nix-update-script { };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Window & compositing manager based on mutter and designed by elementary for use with Pantheon";
     homepage = "https://github.com/elementary/gala";
-    license = licenses.gpl3Plus;
-    platforms = platforms.linux;
-    teams = [ teams.pantheon ];
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.linux;
+    teams = [ lib.teams.pantheon ];
     mainProgram = "gala";
   };
 }

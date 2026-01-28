@@ -9,11 +9,11 @@
 
 stdenv.mkDerivation rec {
   pname = "ergo";
-  version = "5.0.26";
+  version = "6.0.2";
 
   src = fetchurl {
     url = "https://github.com/ergoplatform/ergo/releases/download/v${version}/ergo-${version}.jar";
-    sha256 = "sha256-WVrImdtn6UPWMpd6ltUbJGyqnLPud7JuFPuU4lHS8AE=";
+    sha256 = "sha256-9igU/BTWMbCM4Zzd1+HrjwYMZ8Os+k/fqokxtnCSO04=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -26,13 +26,13 @@ stdenv.mkDerivation rec {
 
   passthru.tests = { inherit (nixosTests) ergo; };
 
-  meta = with lib; {
+  meta = {
     description = "Open protocol that implements modern scientific ideas in the blockchain area";
     homepage = "https://ergoplatform.org/en/";
-    sourceProvenance = with sourceTypes; [ binaryBytecode ];
-    license = licenses.cc0;
-    platforms = platforms.all;
-    maintainers = with maintainers; [ mmahut ];
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    license = lib.licenses.cc0;
+    platforms = lib.platforms.all;
+    maintainers = with lib.maintainers; [ mmahut ];
     mainProgram = "ergo";
   };
 }

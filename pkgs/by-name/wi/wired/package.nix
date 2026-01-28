@@ -6,7 +6,11 @@
   dbus,
   pango,
   cairo,
-  xorg,
+  libxscrnsaver,
+  libxrandr,
+  libxi,
+  libxcursor,
+  libx11,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -20,7 +24,6 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-AWIV/+vVwDZECZ4lFMSFyuyUKJc/gb72PiBJv6lbhnc=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-xE6r8l3d9WAXf4DsGbhEiaeMPs02kXY2dG9dk0/7flQ=";
 
   strictDeps = true;
@@ -30,11 +33,11 @@ rustPlatform.buildRustPackage rec {
     dbus
     pango
     cairo
-    xorg.libXScrnSaver
-    xorg.libXcursor
-    xorg.libXrandr
-    xorg.libX11
-    xorg.libXi
+    libxscrnsaver
+    libxcursor
+    libxrandr
+    libx11
+    libxi
   ];
 
   postInstall = ''

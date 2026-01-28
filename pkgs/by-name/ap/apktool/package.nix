@@ -3,20 +3,30 @@
   stdenv,
   fetchurl,
   makeWrapper,
-  jdk_headless,
+  jre_minimal,
   aapt,
 }:
 
+let
+  jre = jre_minimal.override {
+    modules = [
+      "java.base"
+      "java.desktop"
+      "java.logging"
+      "java.xml"
+    ];
+  };
+in
 stdenv.mkDerivation rec {
   pname = "apktool";
-  version = "2.11.1";
+  version = "2.12.1";
 
   src = fetchurl {
     urls = [
       "https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_${version}.jar"
       "https://github.com/iBotPeaches/Apktool/releases/download/v${version}/apktool_${version}.jar"
     ];
-    hash = "sha256-VtWcUk/HZCY7qNNFdU2Nr1WxiHgYsVzTtZT1VdJJ4ts=";
+    hash = "sha256-Zs9FJKSkWn9WVn0Issm27CN7zdeM7mn9SlnIoCQ66vo=";
   };
 
   dontUnpack = true;
@@ -28,19 +38,19 @@ stdenv.mkDerivation rec {
   installPhase = ''
     install -D ${src} "$out/libexec/apktool/apktool.jar"
     mkdir -p "$out/bin"
-    makeWrapper "${jdk_headless}/bin/java" "$out/bin/apktool" \
+    makeWrapper "${jre}/bin/java" "$out/bin/apktool" \
         --add-flags "-jar $out/libexec/apktool/apktool.jar" \
         --prefix PATH : ${lib.getBin aapt}
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Tool for reverse engineering Android apk files";
     mainProgram = "apktool";
     homepage = "https://ibotpeaches.github.io/Apktool/";
     changelog = "https://github.com/iBotPeaches/Apktool/releases/tag/v${version}";
-    sourceProvenance = with sourceTypes; [ binaryBytecode ];
-    license = licenses.asl20;
-    maintainers = with maintainers; [ offline ];
-    platforms = with platforms; unix;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ offline ];
+    platforms = with lib.platforms; unix;
   };
 }

@@ -11,12 +11,11 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "gorilla-devs";
-    repo = pname;
+    repo = "ferium";
     rev = "v${version}";
     hash = "sha256-eeQjezB6pRdnPADLgDLo8b+bUSP12gfBhFNt/uYCwHU=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-3YKFKngyLg2ah4GY+LlbPbnVks7/xFawnMf3D1gjmwI=";
 
   # Disable the GUI file picker so that GTK/XDG dependencies aren't used
@@ -34,12 +33,12 @@ rustPlatform.buildRustPackage rec {
     done
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Fast and multi-source CLI program for managing Minecraft mods and modpacks from Modrinth, CurseForge, and GitHub Releases";
     mainProgram = "ferium";
     homepage = "https://github.com/gorilla-devs/ferium";
-    license = licenses.mpl20;
-    maintainers = with maintainers; [
+    license = lib.licenses.mpl20;
+    maintainers = with lib.maintainers; [
       leo60228
       soupglasses
     ];

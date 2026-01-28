@@ -11,7 +11,7 @@ let
   enabled = (lib.length cfg.ensureProfiles.secrets.entries) > 0;
 
   nmFileSecretAgentConfig = {
-    entry = builtins.map (
+    entry = map (
       i:
       {
         key = i.key;
@@ -84,7 +84,7 @@ in
                   The NetworkManager configuration settings reference roughly corresponds to connection types.
                   More might be available on your system depending on the installed plugins.
 
-                  https://networkmanager.dev/docs/api/latest/ch01.html
+                  <https://networkmanager.dev/docs/api/latest/ch01.html>
                 '';
                 type = lib.types.nullOr lib.types.str;
                 default = null;

@@ -34,7 +34,8 @@ let
         ldflags = [
           "-s"
           "-w"
-        ] ++ extraLdflags;
+        ]
+        ++ extraLdflags;
       }
       // args
     );
@@ -50,7 +51,6 @@ let
     python3Packages.callPackage (
       {
         buildPythonPackage,
-        pythonOlder,
         parver,
         pip,
         pulumi,
@@ -64,9 +64,7 @@ let
           src
           version
           ;
-        format = "pyproject";
-
-        disabled = pythonOlder "3.7";
+        pyproject = true;
 
         sourceRoot = "${src.name}/sdk/python";
 
@@ -134,7 +132,7 @@ let
       ;
   };
 
-  pulumi-gen = mkBasePackage rec {
+  pulumi-gen = mkBasePackage {
     inherit
       src
       version

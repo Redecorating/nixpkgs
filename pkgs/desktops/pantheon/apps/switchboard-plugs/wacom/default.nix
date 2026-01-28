@@ -16,7 +16,8 @@
   libgudev,
   libwacom,
   switchboard,
-  xorg,
+  libxi,
+  libx11,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,7 +26,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "elementary";
-    repo = pname;
+    repo = "switchboard-plug-wacom";
     rev = version;
     sha256 = "sha256-xTv3QPlLPJQ6C5t4Udy1H9IrLQGuik8prvGlpfFm1DQ=";
   };
@@ -47,19 +48,19 @@ stdenv.mkDerivation rec {
     libgudev
     libwacom
     switchboard
-    xorg.libX11
-    xorg.libXi
+    libx11
+    libxi
   ];
 
   passthru = {
     updateScript = nix-update-script { };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Switchboard Wacom Plug";
     homepage = "https://github.com/elementary/switchboard-plug-wacom";
-    license = licenses.gpl3Plus;
-    platforms = platforms.linux;
-    teams = [ teams.pantheon ];
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.linux;
+    teams = [ lib.teams.pantheon ];
   };
 }

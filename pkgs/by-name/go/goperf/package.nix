@@ -9,15 +9,15 @@
 
 buildGoModule rec {
   pname = "goperf";
-  version = "0-unstable-2025-05-05";
+  version = "0-unstable-2026-01-12";
 
   src = fetchgit {
     url = "https://go.googlesource.com/perf";
-    rev = "a54a20dddd9743f7ac60d2d506e561eaeafd4831";
-    hash = "sha256-+d8s9kEzBJ/21U2x8ZuiGdQrspFIJEmrjxmzNahC/V0=";
+    rev = "5abaabe9f1bd66f90f8a5c17cb71183db0d81820";
+    hash = "sha256-76fYE6cr2L9nTW9QA79GtHmuDy3bM85glVcy4gN94qk=";
   };
 
-  vendorHash = "sha256-nqK6xMKYe4uMXvcqopTAV66qklWUq1TzsP8V67TGJJU=";
+  vendorHash = "sha256-bBL9YUwhnUWBnEykFoSoc7d8wOnEtfiF0aW5cqYzm5U=";
 
   passthru.updateScript = writeShellScript "update-goperf" ''
     export UPDATE_NIX_ATTR_PATH=goperf
@@ -31,11 +31,11 @@ buildGoModule rec {
     ${lib.getExe sd} --string-mode "$oldhash" "$newhash" "$fname"
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Tools and packages for analyzing Go benchmark results";
     homepage = "https://cs.opensource.google/go/x/perf";
-    license = licenses.bsd3;
-    platforms = platforms.all;
-    maintainers = with maintainers; [ pbsds ];
+    license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
+    maintainers = with lib.maintainers; [ pbsds ];
   };
 }

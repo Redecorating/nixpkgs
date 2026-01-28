@@ -4,7 +4,10 @@
   stdenv,
   fetchurl,
   pkg-config,
-  xorg,
+  xorg-server,
+  libxi,
+  libxext,
+  libx11,
 }:
 
 stdenv.mkDerivation rec {
@@ -16,16 +19,15 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs =
-    [
-      stdenv
-    ]
-    ++ lib.optionals enableX11 [
-      xorg.xorgserver
-      xorg.libX11
-      xorg.libXext
-      xorg.libXi
-    ];
+  buildInputs = [
+    stdenv
+  ]
+  ++ lib.optionals enableX11 [
+    xorg-server
+    libx11
+    libxext
+    libxi
+  ];
 
   configureFlags = lib.optional enableX11 "--with-x11";
 

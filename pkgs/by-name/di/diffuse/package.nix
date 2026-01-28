@@ -17,16 +17,16 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "diffuse";
-  version = "0.9.0";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "MightyCreak";
     repo = "diffuse";
     rev = "v${version}";
-    sha256 = "6GdUtdVhhIQL1cD9/e7Byv37PVKXmzVWhJC6GROK7OA=";
+    sha256 = "Svt+llBwJKGXRJZ96dzzdzpL/5jrzXXM/FPZwA7Es8s=";
   };
 
-  format = "other";
+  pyproject = false;
 
   nativeBuildInputs = [
     wrapGAppsHook3
@@ -70,12 +70,12 @@ python3.pkgs.buildPythonApplication rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/MightyCreak/diffuse";
     description = "Graphical tool for merging and comparing text files";
     mainProgram = "diffuse";
-    license = licenses.gpl2;
-    maintainers = with maintainers; [ k3a ];
-    platforms = platforms.unix;
+    license = lib.licenses.gpl2;
+    maintainers = with lib.maintainers; [ k3a ];
+    platforms = lib.platforms.unix;
   };
 }

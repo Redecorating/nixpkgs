@@ -3,7 +3,7 @@
   glib,
   lib,
   stdenv,
-  xorg,
+  lndir,
   switchboard,
   switchboardPlugs,
   plugs,
@@ -29,7 +29,8 @@ stdenv.mkDerivation {
 
   paths = [
     switchboard
-  ] ++ selectedPlugs;
+  ]
+  ++ selectedPlugs;
 
   passAsFile = [ "paths" ];
 
@@ -50,8 +51,13 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out
     for i in $(cat $pathsPath); do
-      ${xorg.lndir}/bin/lndir -silent $i $out
+      ${lndir}/bin/lndir -silent $i $out
     done
+
+    dbus_file="share/dbus-1/services/io.elementary.settings.service"
+    rm -f "$out/$dbus_file"
+    substitute "${switchboard}/$dbus_file" "$out/$dbus_file" \
+      --replace-fail "${switchboard}" "$out"
   '';
 
   preFixup = ''

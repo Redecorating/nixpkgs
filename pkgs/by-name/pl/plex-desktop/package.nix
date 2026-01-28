@@ -12,6 +12,8 @@
   libpulseaudio,
   libva,
   libxkbcommon,
+  libxml2_13,
+  makeDesktopItem,
   makeShellWrapper,
   minizip,
   nss,
@@ -19,7 +21,18 @@
   stdenv,
   writeShellScript,
   xkeyboard_config,
-  xorg,
+  libxcb-wm,
+  libxcb-render-util,
+  libxcb-keysyms,
+  libxcb-image,
+  libxtst,
+  libxrender,
+  libxrandr,
+  libxinerama,
+  libxdamage,
+  libxcomposite,
+  xrandr,
+  libxshmfence,
 }:
 let
   pname = "plex-desktop";
@@ -39,6 +52,15 @@ let
     platforms = [ "x86_64-linux" ];
     mainProgram = "plex-desktop";
   };
+  desktopItem = makeDesktopItem {
+    name = "plex-desktop";
+    desktopName = "Plex";
+    exec = "plex-desktop";
+    icon = "plex-desktop";
+    terminal = false;
+    categories = [ "AudioVideo" ];
+    startupWMClass = "Plex";
+  };
   plex-desktop = stdenv.mkDerivation {
     inherit pname version meta;
 
@@ -56,24 +78,26 @@ let
     buildInputs = [
       elfutils
       ffmpeg_6-headless
+      libedit
       libpulseaudio
       libva
       libxkbcommon
+      libxml2_13
       minizip
       nss
       stdenv.cc.cc
-      xorg.libXcomposite
-      xorg.libXdamage
-      xorg.libXinerama
-      xorg.libXrandr
-      xorg.libXrender
-      xorg.libXtst
-      xorg.libxshmfence
-      xorg.xcbutilimage
-      xorg.xcbutilkeysyms
-      xorg.xcbutilrenderutil
-      xorg.xcbutilwm
-      xorg.xrandr
+      libxcomposite
+      libxdamage
+      libxinerama
+      libxrandr
+      libxrender
+      libxtst
+      libxshmfence
+      libxcb-image
+      libxcb-keysyms
+      libxcb-render-util
+      libxcb-wm
+      xrandr
     ];
 
     strictDeps = true;
@@ -104,8 +128,6 @@ let
       rm $out/lib/libdrm.so*
       rm $out/lib/libdrm*
 
-      ln -s ${libedit}/lib/libedit.so.0 $out/lib/libedit.so.2
-
       # Keep dependencies where the version from nixpkgs is higher.
       cp usr/lib/x86_64-linux-gnu/libasound.so.2 $out/lib/libasound.so.2
       cp usr/lib/x86_64-linux-gnu/libjbig.so.0 $out/lib/libjbig.so.0
@@ -132,11 +154,8 @@ buildFHSEnv {
 
   extraInstallCommands = ''
     mkdir -p $out/share/applications $out/share/icons/hicolor/scalable/apps
-    install -m 444 -D ${plex-desktop}/meta/gui/plex-desktop.desktop $out/share/applications/plex-desktop.desktop
-    substituteInPlace $out/share/applications/plex-desktop.desktop \
-      --replace-fail \
-      'Icon=''${SNAP}/meta/gui/icon.png' \
-      'Icon=${plex-desktop}/meta/gui/icon.png'
+    install -m 444 -D ${desktopItem}/share/applications/plex-desktop.desktop $out/share/applications/plex-desktop.desktop
+    install -m 444 -D ${plex-desktop}/meta/gui/icon.png $out/share/icons/hicolor/scalable/apps/plex-desktop.png
   '';
 
   runScript = writeShellScript "plex-desktop.sh" ''
@@ -152,6 +171,9 @@ buildFHSEnv {
 
     # db files should have write access.
     chmod --recursive 750 "$PLEX_DB"
+
+    # These environment variables sometimes silently cause plex to crash.
+    unset QT_QPA_PLATFORM QT_STYLE_OVERRIDE
 
     set -o allexport
     ${lib.toShellVars extraEnv}

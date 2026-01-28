@@ -12,23 +12,20 @@
   more-itertools,
   pydantic,
   pytestCheckHook,
-  pythonOlder,
   pyyaml,
   typing-extensions,
 }:
 
 buildPythonPackage rec {
   pname = "dbt-semantic-interfaces";
-  version = "0.8.1";
+  version = "0.10.3";
   pyproject = true;
-
-  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "dbt-labs";
     repo = "dbt-semantic-interfaces";
     tag = "v${version}";
-    hash = "sha256-gY2CJqN/ohYs4Qej451PexWcsM7N9GuHt79qC+NC7T4=";
+    hash = "sha256-uTlz41eIcEqMvD9d9jvn7g9sZs4uEKUdsmZ0fwWkIuY=";
   };
 
   pythonRelaxDeps = [ "importlib-metadata" ];
@@ -56,11 +53,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "dbt_semantic_interfaces" ];
 
-  meta = with lib; {
+  meta = {
     description = "Shared interfaces used by dbt-core and MetricFlow projects";
     homepage = "https://github.com/dbt-labs/dbt-semantic-interfaces";
-    changelog = "https://github.com/dbt-labs/dbt-semantic-interfaces/releases/tag/v${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ pbsds ];
+    changelog = "https://github.com/dbt-labs/dbt-semantic-interfaces/releases/tag/${src.tag}";
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ pbsds ];
   };
 }

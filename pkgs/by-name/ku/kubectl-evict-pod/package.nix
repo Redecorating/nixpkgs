@@ -10,18 +10,18 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "rajatjindal";
-    repo = pname;
+    repo = "kubectl-evict-pod";
     rev = "v${version}";
     sha256 = "sha256-Z1NIueonjyO2GHulBbXbsQtX7V/Z95GUoZv9AqjLIR0=";
   };
 
   vendorHash = null;
 
-  meta = with lib; {
+  meta = {
     description = "This plugin evicts the given pod and is useful for testing pod disruption budget rules";
     mainProgram = "kubectl-evict-pod";
     homepage = "https://github.com/rajatjindal/kubectl-evict-pod";
-    license = licenses.asl20;
-    maintainers = [ maintainers.j4m3s ];
+    license = lib.licenses.asl20;
+    maintainers = [ lib.maintainers.j4m3s ];
   };
 }

@@ -4,6 +4,7 @@
   fetchFromGitHub,
   pkg-config,
   cmake,
+  oniguruma,
   openssl,
   zlib,
   perl,
@@ -47,7 +48,6 @@ rustPlatform.buildRustPackage rec {
     "--skip=test_refactor_action_sequence"
   ];
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-KR6BmYj3q9w0yGHFq9+l1x989XjiG3mkaZiyDGCYWPA=";
 
   nativeBuildInputs = [
@@ -57,9 +57,15 @@ rustPlatform.buildRustPackage rec {
   ];
 
   buildInputs = [
+    oniguruma
     openssl
     zlib
   ];
+
+  # use system oniguruma since the bundled one fails to build with gcc15
+  env.RUSTONIG_SYSTEM_LIBONIG = 1;
+
+  cargoBuildFlags = [ "-p lsp-ai" ];
 
   passthru.updateScript = gitUpdater {
     rev-prefix = "v";

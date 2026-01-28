@@ -12,7 +12,7 @@
   pkg-config,
   powertop,
   testers,
-  xorg,
+  xset,
   zlib,
 }:
 
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     substituteInPlace src/main.cpp --replace-fail "/sbin/modprobe" "modprobe"
-    substituteInPlace src/calibrate/calibrate.cpp --replace-fail "/usr/bin/xset" "${lib.getExe xorg.xset}"
+    substituteInPlace src/calibrate/calibrate.cpp --replace-fail "/usr/bin/xset" "${lib.getExe xset}"
     substituteInPlace src/tuning/bluetooth.cpp --replace-fail "/usr/bin/hcitool" "hcitool"
   '';
 
@@ -61,16 +61,16 @@ stdenv.mkDerivation rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     inherit (src.meta) homepage;
     changelog = "https://github.com/fenrus75/powertop/releases/tag/v${version}";
     description = "Analyze power consumption on Intel-based laptops";
     mainProgram = "powertop";
-    license = licenses.gpl2Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl2Only;
+    maintainers = with lib.maintainers; [
       fpletz
       anthonyroussel
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
   };
 }

@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
@@ -14,8 +15,8 @@ buildGoModule {
 
   src = fetchFromGitHub {
     owner = "buildpacks";
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    repo = "pack";
+    tag = "v${version}";
     hash = "sha256-QCN0UvWa5u9XX5LvY3yD8Xz2s1XzZUg/WXnAfWwZnY0=";
   };
 
@@ -31,7 +32,7 @@ buildGoModule {
     "-X github.com/buildpacks/pack.Version=${version}"
   ];
 
-  postInstall = ''
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd pack \
       --zsh $(PACK_HOME=$PWD $out/bin/pack completion --shell zsh) \
       --bash $(PACK_HOME=$PWD $out/bin/pack completion --shell bash) \

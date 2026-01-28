@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   version = "2.27";
   src = fetchFromGitHub {
     owner = "Yubico";
-    repo = pname;
+    repo = "yubico-pam";
     rev = version;
     sha256 = "0hb773zlf11xz4bwmsqv2mq5d4aq2g0crdr5cp9xwc4ivi5gd4kg";
   };
@@ -37,11 +37,11 @@ stdenv.mkDerivation rec {
     libykclient
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Yubico PAM module";
     mainProgram = "ykpamcfg";
     homepage = "https://developers.yubico.com/yubico-pam";
-    license = licenses.bsd2;
+    license = lib.licenses.bsd2;
     maintainers = [ ];
   };
 }

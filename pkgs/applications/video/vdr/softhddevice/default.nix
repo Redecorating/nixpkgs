@@ -9,18 +9,19 @@
   ffmpeg,
   libva,
   libvdpau,
-  xorg,
+  libx11,
+  libxcb,
   libGL,
   libGLU,
 }:
 stdenv.mkDerivation rec {
   pname = "vdr-softhddevice";
-  version = "2.4.5";
+  version = "2.4.6";
 
   src = fetchFromGitHub {
     owner = "ua0lnj";
     repo = "vdr-plugin-softhddevice";
-    sha256 = "sha256-G5pOSlO1FU7kvHwH1yw8UBEeDwQ5aIxubdyFcWQ2Z/8=";
+    sha256 = "sha256-69mLiu/v+iZntrGvL0eNE/dDQwRVIlg5MfsNTr52Ots=";
     rev = "v${version}";
   };
 
@@ -31,8 +32,8 @@ stdenv.mkDerivation rec {
     alsa-lib
     libva
     libvdpau
-    xorg.libxcb
-    xorg.libX11
+    libxcb
+    libx11
     libGL
     libGLU
   ];
@@ -44,11 +45,11 @@ stdenv.mkDerivation rec {
       --replace "LOCALBASE \"/bin/X\"" "\"${xorgserver}/bin/X\""
   '';
 
-  meta = with lib; {
+  meta = {
     inherit (src.meta) homepage;
     description = "VDR SoftHDDevice Plug-in";
-    maintainers = [ maintainers.ck3d ];
-    license = licenses.gpl2;
+    maintainers = [ lib.maintainers.ck3d ];
+    license = lib.licenses.gpl2;
     inherit (vdr.meta) platforms;
   };
 

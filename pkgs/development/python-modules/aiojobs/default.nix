@@ -14,9 +14,7 @@
 buildPythonPackage rec {
   pname = "aiojobs";
   version = "1.4.0";
-  format = "pyproject";
-
-  disabled = pythonOlder "3.8";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "aio-libs";
@@ -37,7 +35,8 @@ buildPythonPackage rec {
     pytestCheckHook
     pytest-aiohttp
     pytest-cov-stub
-  ] ++ lib.flatten (builtins.attrValues optional-dependencies);
+  ]
+  ++ lib.concatAttrValues optional-dependencies;
 
   pythonImportsCheck = [ "aiojobs" ];
 

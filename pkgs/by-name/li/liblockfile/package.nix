@@ -5,12 +5,11 @@
 }:
 
 stdenv.mkDerivation rec {
-  _name = "liblockfile";
+  pname = "liblockfile";
   version = "1.17";
-  name = "${_name}-${version}";
 
   src = fetchurl {
-    url = "mirror://debian/pool/main/libl/${_name}/${_name}_${version}.orig.tar.gz";
+    url = "mirror://debian/pool/main/libl/liblockfile/liblockfile_${version}.orig.tar.gz";
     sha256 = "sha256-bpN/NlCvq0qsGY80i4mxykLtzrF/trsJGPZCFDzP0V4=";
   };
 
@@ -27,8 +26,6 @@ stdenv.mkDerivation rec {
     mainProgram = "dotlockfile";
     homepage = "http://packages.debian.org/unstable/libs/liblockfile1";
     license = lib.licenses.gpl2Plus;
-
-    maintainers = [ lib.maintainers.bluescreen303 ];
     platforms = lib.platforms.all;
   };
 }

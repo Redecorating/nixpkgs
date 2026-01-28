@@ -10,23 +10,22 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "mookid";
-    repo = pname;
+    repo = "diffr";
     rev = "v${version}";
     sha256 = "sha256-ylZE2NtTXbGqsxE72ylEQCacTyxBO+/WgvEpoXd5OZI=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-pbGfoEk8peWBA0F0EdiAJJtan74O5RD6TmNJUTY2ijA=";
 
   preCheck = ''
     export DIFFR_TESTS_BINARY_PATH=$releaseDir/diffr
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Yet another diff highlighting tool";
     mainProgram = "diffr";
     homepage = "https://github.com/mookid/diffr";
-    license = with licenses; [ mit ];
+    license = with lib.licenses; [ mit ];
     maintainers = [ ];
   };
 }
